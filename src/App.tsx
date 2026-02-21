@@ -148,28 +148,9 @@ export default function App() {
                 <ChevronRight size={14} />
               </div>
             </header>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[20px]">
-              {dashboardCards.map((card, index) => (
-                <motion.div
-                  key={index}
-                  whileHover={{ y: -2 }}
-                  onClick={() => setActiveNav(card.title as Tab)}
-                  className="bg-white p-[20px] rounded-[12px] border border-[#E2E8F0] hover:border-[#CBD5E1] transition-all group cursor-pointer"
-                >
-                  <div className={cn(
-                    "w-10 h-10 rounded-[8px] flex items-center justify-center text-white mb-6 transition-transform group-hover:scale-105",
-                    card.color
-                  )}>
-                    {card.icon}
-                  </div>
-                  <h3 className="text-[16px] font-bold text-[#1E293B] mb-1">{card.title}</h3>
-                  <p className="text-[13px] text-[#64748B] leading-relaxed">{card.subtitle}</p>
-                </motion.div>
-              ))}
-            </div>
 
-            {/* Vision Board Section */}
-            <div className="mt-16">
+            {/* Vision Board Section - Now at the Top */}
+            <div className="mb-16">
               <div className="flex items-center justify-between mb-8">
                 <div>
                   <h3 className="text-[20px] font-bold text-[#1E293B]">Vision Board</h3>
@@ -211,6 +192,26 @@ export default function App() {
                   ))}
                 </AnimatePresence>
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[20px]">
+              {dashboardCards.map((card, index) => (
+                <motion.div
+                  key={index}
+                  whileHover={{ y: -2 }}
+                  onClick={() => setActiveNav(card.title as Tab)}
+                  className="bg-white p-[20px] rounded-[12px] border border-[#E2E8F0] hover:border-[#CBD5E1] transition-all group cursor-pointer"
+                >
+                  <div className={cn(
+                    "w-10 h-10 rounded-[8px] flex items-center justify-center text-white mb-6 transition-transform group-hover:scale-105",
+                    card.color
+                  )}>
+                    {card.icon}
+                  </div>
+                  <h3 className="text-[16px] font-bold text-[#1E293B] mb-1">{card.title}</h3>
+                  <p className="text-[13px] text-[#64748B] leading-relaxed">{card.subtitle}</p>
+                </motion.div>
+              ))}
             </div>
           </div>
         );
@@ -262,6 +263,16 @@ export default function App() {
             <div className="mb-12">
               <h1 className="text-xl font-bold text-[#0F172A] tracking-tight">Meu Bullet</h1>
               <p className="text-[11px] text-[#64748B] mt-1 font-medium uppercase tracking-wider">Organize sua vida</p>
+              <button 
+                onClick={() => setActiveNav('Configurações')}
+                className="mt-6 w-12 h-12 rounded-2xl bg-[#F1F5F9] flex items-center justify-center text-[#64748B] overflow-hidden hover:ring-2 hover:ring-[#0F172A] transition-all shadow-sm"
+              >
+                {userProfile.photoUrl ? (
+                  <img src={userProfile.photoUrl} alt={userProfile.name} className="w-full h-full object-cover" />
+                ) : (
+                  <User size={20} />
+                )}
+              </button>
             </div>
 
             <nav className="flex-1 space-y-8 overflow-y-auto custom-scrollbar pr-2">
@@ -296,22 +307,12 @@ export default function App() {
               </div>
             </nav>
 
-            <div className="mt-auto pt-6 border-t border-[#F1F5F9] flex items-center justify-between">
+            <div className="mt-auto pt-6 border-t border-[#F1F5F9] flex items-center space-x-2">
               <button className="p-2 text-[#64748B] hover:text-[#0F172A] transition-colors">
                 <Search size={18} />
               </button>
               <button className="p-2 text-[#64748B] hover:text-[#0F172A] transition-colors">
                 <Bell size={18} />
-              </button>
-              <button 
-                onClick={() => setActiveNav('Configurações')}
-                className="w-8 h-8 rounded-full bg-[#F1F5F9] flex items-center justify-center text-[#64748B] overflow-hidden hover:ring-2 hover:ring-[#0F172A] transition-all"
-              >
-                {userProfile.photoUrl ? (
-                  <img src={userProfile.photoUrl} alt={userProfile.name} className="w-full h-full object-cover" />
-                ) : (
-                  <User size={16} />
-                )}
               </button>
             </div>
           </aside>
