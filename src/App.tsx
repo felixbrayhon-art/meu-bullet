@@ -58,9 +58,32 @@ import { ptBR } from 'date-fns/locale';
 import { cn } from './lib/utils';
 import { BulletEntry, Habit, Transaction, MoodEntry, GratitudeEntry, Collection, Tab, UserProfile, VisionItem } from './types';
 
+// --- Persistence Hook ---
+function useLocalStorage<T>(key: string, initialValue: T): [T, React.Dispatch<React.SetStateAction<T>>] {
+  const [storedValue, setStoredValue] = useState<T>(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      console.error(error);
+      return initialValue;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(key, JSON.stringify(storedValue));
+    } catch (error) {
+      console.error(error);
+    }
+  }, [key, storedValue]);
+
+  return [storedValue, setStoredValue];
+}
+
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
-  const [activeNav, setActiveNav] = useState<Tab>('Início');
+  const [activeNav, setActiveNav] = useLocalStorage<Tab>('mb_active_nav', 'Início');
   
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -70,26 +93,26 @@ export default function App() {
   }, []);
 
   // User Profile State
-  const [userProfile, setUserProfile] = useState<UserProfile>({
+  const [userProfile, setUserProfile] = useLocalStorage<UserProfile>('mb_profile', {
     name: 'Usuário',
     photoUrl: ''
   });
   
   // Data States
-  const [dailyLog, setDailyLog] = useState<BulletEntry[]>([]);
-  const [weeklyLog, setWeeklyLog] = useState<BulletEntry[]>([]);
-  const [monthlyLog, setMonthlyLog] = useState<BulletEntry[]>([]);
-  const [futureLog, setFutureLog] = useState<BulletEntry[]>([]);
-  const [habits, setHabits] = useState<Habit[]>([
+  const [dailyLog, setDailyLog] = useLocalStorage<BulletEntry[]>('mb_daily', []);
+  const [weeklyLog, setWeeklyLog] = useLocalStorage<BulletEntry[]>('mb_weekly', []);
+  const [monthlyLog, setMonthlyLog] = useLocalStorage<BulletEntry[]>('mb_monthly', []);
+  const [futureLog, setFutureLog] = useLocalStorage<BulletEntry[]>('mb_future', []);
+  const [habits, setHabits] = useLocalStorage<Habit[]>('mb_habits', [
     { id: '1', name: 'Beber 2L de água', completedDays: [] },
     { id: '2', name: 'Meditar 10min', completedDays: [] },
     { id: '3', name: 'Ler 20 páginas', completedDays: [] }
   ]);
-  const [moods, setMoods] = useState<MoodEntry[]>([]);
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [gratitude, setGratitude] = useState<GratitudeEntry[]>([]);
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [visionBoard, setVisionBoard] = useState<VisionItem[]>([
+  const [moods, setMoods] = useLocalStorage<MoodEntry[]>('mb_moods', []);
+  const [transactions, setTransactions] = useLocalStorage<Transaction[]>('mb_finances', []);
+  const [gratitude, setGratitude] = useLocalStorage<GratitudeEntry[]>('mb_gratitude', []);
+  const [collections, setCollections] = useLocalStorage<Collection[]>('mb_collections', []);
+  const [visionBoard, setVisionBoard] = useLocalStorage<VisionItem[]>('mb_vision', [
     { id: '1', title: 'Viagem dos Sonhos', imageUrl: 'https://picsum.photos/seed/travel/400/300' },
     { id: '2', title: 'Nova Casa', imageUrl: 'https://picsum.photos/seed/home/400/300' },
     { id: '3', title: 'Foco e Saúde', imageUrl: 'https://picsum.photos/seed/health/400/300' }
@@ -450,8 +473,8 @@ function BulletLogView({ title, entries, setEntries, onBack }: { title: string, 
 
 function HabitTracker({ habits, setHabits, onBack }: { habits: Habit[], setHabits: React.Dispatch<React.SetStateAction<Habit[]>>, onBack: () => void }) {
   const [newHabit, setNewHabit] = useState('');
-  const [viewMode, setViewMode] = useState<'chart' | 'matrix'>('matrix');
-  const [chartOrientation, setChartOrientation] = useState<'vertical' | 'horizontal'>('vertical');
+  const [viewMode, setViewMode] = useLocalStorage<'chart' | 'matrix'>('mb_habit_view', 'matrix');
+  const [chartOrientation, setChartOrientation] = useLocalStorage<'vertical' | 'horizontal'>('mb_habit_orient', 'vertical');
   const today = format(new Date(), 'yyyy-MM-dd');
 
   const addHabit = (e: React.FormEvent) => {
@@ -1029,7 +1052,7 @@ function SidebarItem({ icon, label, active, onClick }: { icon: React.ReactNode, 
 
 function PomodoroTimer({ onBack }: { onBack: () => void }) {
   const [mode, setMode] = useState<'work' | 'short' | 'long'>('work');
-  const [durations, setDurations] = useState({ work: 25, short: 5, long: 15 });
+  const [durations, setDurations] = useLocalStorage('mb_pomo_durations', { work: 25, short: 5, long: 15 });
   const [timeLeft, setTimeLeft] = useState(durations.work * 60);
   const [isActive, setIsActive] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
